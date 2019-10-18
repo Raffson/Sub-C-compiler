@@ -1,0 +1,1 @@
+for f in subcPrograms/*.subc; do python main.py $f; done

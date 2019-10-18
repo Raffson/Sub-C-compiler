@@ -1,0 +1,278 @@
+#include <stdio.h>
+
+//at this point, rotors should be valid
+void getRotors(char (*rs)[3][27], char *rots)
+{
+  int count = 0;
+  while( *rots != 0 )
+  {
+    if( *rots == '0' )
+      (*rs)[count] = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
+    else if( *rots == '1' )
+      (*rs)[count] = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
+    else if( *rots == '2' )
+      (*rs)[count] = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
+    else if( *rots == '3' )
+      (*rs)[count] = "THEQUICKBROWNFXJMPSVLAZYDG";
+    else if( *rots == '4' )
+      (*rs)[count] = "XANTIPESOKRWUDVBCFGHJLMQYZ";
+    else if( *rots == '5' )
+      (*rs)[count] = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
+    else if( *rots == '6' )
+      (*rs)[count] = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
+    else if( *rots == '7' )
+      (*rs)[count] = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
+    count++;
+    rots += 1;
+  }
+}
+
+//can also be used as inverse rotor
+char plugBoard(char c, char *plugs)
+{
+  int i = 0;
+  while( *plugs != 0 )
+  {
+    if( c == (*((char*)((int)(plugs)+i))) )
+      return ('A'+i);
+    i++;
+  }
+  return 'A'; //should never be the case though
+}
+
+char shift(char c, char *key, const int r, int *i)
+{
+  *i = ((*(char*)((int)(key)+r))-'A');
+  c = ( 'A'+(((c-'A')+(*i))%26) );
+  return c;
+}
+
+//can also be used for reflector
+char rotor(char c, char r[27])
+{
+  int index = c-'A';
+  return r[index];
+  //return r[(int)(c-'A')];
+}
+
+char unshift(char c, const int i)
+{
+  int pos = c - 'A';
+  if( pos < i ) return (c+(26-i));
+  else return (c-i);
+}
+
+char enigmasMagic(char rs[3][27], char ref[27], char *plugs, char *key, char c)
+{
+  //printf("%c ", c)
+  c = plugBoard(c, plugs);
+  int i = 0;
+  //printf("%c ", c)
+  c = shift(c, key, 2, &i);
+  //printf("%c ", c)
+  c = rotor(c, rs[2]);
+  //printf("%c ", c)
+  c = unshift(c, i);
+  //printf("%c ", c)
+  c = shift(c, key, 1, &i);
+  //printf("%c ", c)
+  c = rotor(c, rs[1]);
+  //printf("%c ", c)
+  c = unshift(c, i);
+  //printf("%c ", c)
+  c = shift(c, key, 0, &i);
+  //printf("%c ", c)
+  c = rotor(c, rs[0]);
+  //printf("%c ", c)
+  c = unshift(c, i);
+  //printf("%c ", c)
+  c = rotor(c, ref); // reflector
+  //printf("%c ", c)
+  c = shift(c, key, 0, &i);
+  //printf("%c ", c)
+  c = plugBoard(c, &(rs[0][0]));
+  //printf("%c ", c)
+  c = unshift(c, i);
+  //printf("%c ", c)
+  c = shift(c, key, 1, &i);
+  //printf("%c ", c)
+  c = plugBoard(c, &(rs[1][0]));
+  //printf("%c ", c)
+  c = unshift(c, i);
+  //printf("%c ", c)
+  c = shift(c, key, 2, &i);
+  //printf("%c ", c)
+  c = plugBoard(c, &(rs[2][0]));
+  //printf("%c ", c)
+  c = unshift(c, i);
+  //printf("%c ", c)
+  c = plugBoard(c, plugs);
+  //printf("%c\n", c)
+  return c;
+}
+
+int keyChecks(char *key)
+{
+  int count = 0;
+  while( *key != 0 )
+  {
+    count++;
+    if( !((*key >= 65 && *key <= 90) || (*key >= 97 && *key <= 122)) )
+    {
+      printf("Key contains non-alphabatic characters which is not allowed.\n");
+      return 1;
+    }
+    if( (*key >= 97 && *key <= 122) )
+      *key = *key - 32;
+    key += 1;
+  }
+  if( count != 3 )
+  {
+    printf("Key must be exactly 3 letters long.\n");
+    return 1;
+  }
+  return 0;
+}
+
+int rotChecks(char *rots)
+{
+  int count = 0;
+  while( *rots != 0 )
+  {
+    count++;
+    if( !(*rots >= 48 && *rots <= 55) )
+    {
+      printf("Rotors contain non-digits which is not allowed or 8 & 9 which don't represent a rotor. Use 0-7 instead...\n");
+      return 1;
+    }
+    rots += 1;
+  }
+  if( count != 3 )
+  {
+    printf("Rotors must be exactly 3 digits long.\n");
+    return 1;
+  }
+  return 0;
+}
+
+int plugChecks(char *plugs)
+{
+  int count = 0;
+  //char taken[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  char *base = plugs;
+  while( *plugs != 0 )
+  {
+    count++;
+    if( !((*plugs >= 65 && *plugs <= 90) || (*plugs >= 97 && *plugs <= 122)) )
+    {
+      printf("Plugboard contains non-alphabatic characters which is not allowed.\n");
+      return 1;
+    }
+    if( (*plugs >= 97 && *plugs <= 122) )
+      *plugs = *plugs - 32;
+    int offset = (int)(*base) + (int)(*plugs) - 130;
+    char c = offset + 65;
+    char *tgt = base;
+    tgt += offset;
+    if( *tgt != c )
+    {
+      printf("Invalid plugboard specified. All characters must be unique and swapped symmetrically.\n");
+      printf("E.g.: If you wish to connect A and P on the plugboard, enter PBCDEFGHIJKLMNOAQRSTUVWXYZ.\n");
+      printf("Notice how A and P have been swapped...\n");
+      return 1;
+    }
+    plugs += 1;
+  }
+  if( count != 26 )
+  {
+    printf("Pluboard must be exactly 26 characters long.\n");
+    return 1;
+  }
+  return 0;
+}
+
+int textChecks(char *text)
+{
+  while( *text != 0 )
+  {
+    if( !((*text >= 65 && *text <= 90) || (*text >= 97 && *text <= 122)) )
+    {
+      printf("Text contains non-alphabatic characters which is not allowed.\n");
+      return 1;
+    }
+    if( (*text >= 97 && *text <= 122) )
+      *text = *text - 32;
+    text += 1;
+  }
+  return 0;
+}
+
+void main()
+{
+  char *key; //will be used for inputting a string, i.e. the key (must be 3 letters, will check on that later)
+  char *rots; //will be used for inputting a string, i.e. the rotorcombination (must be 3 numbers, will check on that later)
+  char *plugs; //will be used for inputting a string, i.e. the plugboard (will also check conditions later)
+  scanf("Enter a 3-letter string that represents the key (end sequence with escape): %s\n", &key);
+  if( keyChecks(key) )
+  {
+    printf("Invalid key was given. Terminating program...\n");
+    return;
+  }
+  scanf("Enter a 3-numbers string that represents the rotorcombination (end sequence with escape): %s\n", &rots);
+  if( rotChecks(rots) )
+  {
+    printf("Invalid rotor combination was given. Terminating program...\n");
+    return;
+  }
+  scanf("Enter a 26-letter (each letter only occuring once) string that represents the plugboard (end sequence with escape): %s\n"
+      , &plugs);
+  if( plugChecks(plugs) )
+  {
+    printf("Invalid plugboard was given. Terminating program...\n");
+    return;
+  }
+
+  char *text;
+  scanf("Enter the text that you wish to encrypt/decrypt: %s\n", &text);
+  if( textChecks(text) )
+  {
+    printf("Invalid text was given. Terminating program...\n");
+    return;
+  }
+
+  printf("Original (encrypted) text:  key= %s", key);
+  printf("   rotors= %s\n", rots);
+  printf("plugs= %s\n", plugs);
+  printf("%s\n\n",text);
+  char rs[3][27];
+  getRotors(&rs, rots);
+  char ref[27] = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
+
+  //start cipher/decipher
+  char *runner = text;
+  while( *runner != 0 )
+  {
+    *runner = enigmasMagic(rs, ref, plugs, key, *runner);
+    if( *(char*)((int)(key)+2) == 'Z' )
+    {
+      *(char*)((int)(key)+2) = 'A';
+      if( *(char*)((int)(key)+1) == 'Z' )
+      {
+        *(char*)((int)(key)+1) = 'A';
+        if( *key == 'Z' ) *key = 'A';
+        else (*key)++;
+      }
+      else (*(char*)((int)(key)+1))++;
+    }
+    else (*(char*)((int)(key)+2))++;
+    runner += 1;
+  }
+
+  printf("Resulting string: %s\n", text);
+  return;
+}
+
+
+
+
+

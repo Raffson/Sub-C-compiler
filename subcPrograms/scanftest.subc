@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+void test();
+
+void main()
+{
+    int number;
+    char *string;
+    char c;
+    float f;
+    scanf("Enter an integer:\n%d", &number);
+    scanf("Enter a string:\n%s", &string);
+    scanf("Enter a character:\n%c", &c);
+    scanf("Enter a float:\n%f", &f);
+    printf("Integer = %d\nString = %s\nChar = %c\nFloat = %f\n", number, string, c, f);
+
+    test();
+}
+
+int glob = 123;
+
+void test()
+{
+  glob++;
+  printf("%d\n", glob);
+}

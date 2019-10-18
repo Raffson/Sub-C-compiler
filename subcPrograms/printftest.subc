@@ -1,0 +1,105 @@
+#include <stdio.h>
+
+void testfunc(char test2[], int number, char test[], float f, char c)
+{
+    printf(test2, (number>>1), (&(test[0])), f, c);
+}
+
+void main()
+{
+    int number = -128 + 010 + 0xF7;
+
+    char test[] = "Ok it's working...\n";
+    char test2[] = "Integer = %d\nTeststring: %s\nTesting float: %f\nOutput character: %c\n";
+    float f = .1234534E4 - 456.445;
+    float g = 0.865776545 - 0.34556776;
+    char c = '-'*'!';
+    char d = '\n';
+
+    // printf() dislpays the formatted output
+    printf("Integer = %d\nTeststring: %s\nTesting float: %f  %f\nOutput character: %c\n",
+        number, (&(test[0])), (float)(char)f, g, c);
+    testfunc(test2, number, test, f , !c);
+    printf("EqTest 4 == 5: %d\nEqTest 5 == 5: %d\nLesTest 4 < 5: %d\nLesTest 5 < 5: %d\nLeqTest 5 <= 5: %d\nLeqTest 6 <= 5: %d\n",
+        (4 == 5), (5 == 5), (4 < 5), (5 < 5), (5 <= 5), (6 <= 5) );
+    printf("Neq 4 != 5: %d\nNeq 5 != 5: %d\nGrt number+1 > number: %d\nGrt 5 > 5: %d\nGeq number >= 5: %d\nGeq 4 >= 5: %d\n",
+        (4 != 5), 5 != 5, (6 > 5), (number+1 > number), (5 >= 5), (number >= 5) );
+    printf("1 AND 0 = %d\n1 AND 1 = %d\n0 AND 1 = %d\n0 AND 0 = %d\nnumber AND c = %d\nd AND 1 = %d\n",
+        (1 && 0), 1 && 1, 0 && 1, (0 && 0), (number && c), d && 1);
+    printf("1 OR 0 = %d\n1 OR 1 = %d\n0 OR 1 = %d\n0 OR 0 = %d\nnumber OR c = %d\nd OR 1 = %d\n",
+        (1 || 0), 1 || 1, 0 || 1, (0 || 0), (number || c), d || 1);
+    printf("Conditional test 4>5 ? ++number : --number\nnumber = %d\n",
+        ((4 > 5) ? ++number : --number));
+    printf("Conditional test 4<5 ? ++number : --number\nnumber = %d\n",
+        ((4 < 5) ? ++number : --number));
+
+
+    int x;
+    x = number;
+    printf("Assignment Test x=number: %d\n", x);
+    x /= number;
+    printf("/=number Test: %d\n", x);
+    x += 5;
+    printf("+=5 Test: %d\n", x);
+    x >>= 1;
+    printf(">>=1 Test: %d\n", x);
+    x <<= 1;
+    printf("<<=1 Test: %d\n", x);
+    x *= 10;
+    printf("*=10 Test: %d\n", x);
+    x %= 13;
+    printf("%%=13 Test: %d\n", x);
+    x -= 1;
+    printf("-=1 Test: %d\n", x);
+
+    x+x; //this used to mess with stuff because it would load a value on the stack & it would be stuck there
+    //that's no longer the case with __inAssignableContext
+
+    printf("Conditional test with multiple expressions before: %d  %d\n", number, x);
+    true ? number++ : number--;
+    printf("Conditional test with multiple expressions after true: %d  %d\n", number, x);
+    false ? (number++, x = 25) : (number--, x = 15);
+    printf("x = %d\n", x);
+    int y = x;
+    printf("y = %d\n", y);
+    printf("Conditional test with multiple expressions after false: %d  %d\n", number, y<<2);
+
+
+    int m[4] = {1, 2, 3, 5};
+    printf("m[0] = %d\nm[1] = %d\nm[2] = %d\nm[3] = %d\n", m[0], m[1], m[2], m[3]);
+    int n[3][3] = {{1,2,3}, {4,5,6}, {7,8,9}};
+    printf("%d\t%d\t%d\n%d\t%d\t%d\n%d\t%d\t%d\n", n[0][0],n[0][1],n[0][2],n[1][0],n[1][1],n[1][2],n[2][0],n[2][1],n[2][2]);
+
+    if(true)
+      if( true )
+      {
+        int a = 5;
+        printf("Printing this...\n");
+        if( false )
+          printf("This will not be printed...\n");
+        else
+          printf("Now printing this...\n");
+        if( x > y )
+        {
+          printf("x > y\n");
+          printf("y = %d\n", 3);
+        }
+        else
+        {
+          int a = 10;
+          printf("x <= y\n");
+          printf("x = %d\n", x);
+          printf("y = %d\n", y);
+        }
+      }
+      else
+      {
+        printf("This is some test that will not occur...\n");
+      }
+    else
+      printf("Another Test...");
+
+    c = 'q';
+    printf("%c\n", c++);
+    printf("%c\n", c);
+}

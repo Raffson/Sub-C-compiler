@@ -1,0 +1,15 @@
+#include <stdio.h>
+
+int fibs(int n)
+{
+  if( n > 1)
+    return fibs(n-2) + fibs(n-1);
+  else
+    return 1;
+}
+
+void main()
+{
+  int n = 10;
+  printf("%d-th Fibonacci number = %d\n", n, fibs(n));
+}

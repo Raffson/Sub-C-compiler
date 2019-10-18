@@ -1,0 +1,70 @@
+#include <stdio.h>
+
+void addCubes(const float (*a)[3][3][3], const float (*b)[3][3][3], float (*r)[3][3][3], int size)
+{
+  //since cubes have the same size in every dimension we only need 1 parameter...
+  //multidimensional open arrays don't work correctly
+  int i, j, k;
+  for( i=0; i < size; i++ )
+    for( j=0; j < size; j++ )
+      for( k=0; k < size; k++ )
+        (*r)[i][j][k] = (*a)[i][j][k] + (*b)[i][j][k];
+}
+
+void printCube(const float (*a)[3][3][3], int size)
+{
+  int i, j, k;
+  for( i=0; i < size; i++ )
+  {
+    printf("Element %d of 3rd dimension:\n", i);
+    for( j=0; j < size; j++ )
+    {
+      for( k=0; k < (size-1); k++ )
+        printf("%f\t", (*a)[i][j][k]);
+      printf("%f\n", (*a)[i][j][k]);
+    }
+    printf("\n");
+  }
+}
+
+void recursivePascalTriangle(int a[], int size, int depth)
+{
+  int i;
+  for( i=0; i < (size-1); i++ )
+    printf("%d  ", a[i]);
+  printf("%d\n", a[size-1]);
+  if( depth > 1 )
+  {
+    int b[10];
+    b[0] = 1;
+    b[size] = 1;
+    for( i=1; i < size; i++ )
+      b[i] = a[i-1] + a[i];
+    recursivePascalTriangle(b, (size+1), (depth-1));
+  }
+}
+
+void main()
+{
+  float m[3][3][3] = { {{1.0,2.0,3.0},{4.0,5.0,6.0},{7.0,8.0,9.0}},
+                      {{10.0,11.0,12.0},{13.0,14.0,15.0},{16.0,17.0,18.0}},
+                      {{19.0,20.0,21.0},{22.0,23.0,24.0},{25.0,26.0,27.0}} };
+  float n[3][3][3] = { {{27.,26.,25.},{24.,23.,22.},{21.,20.,19.}},
+                      {{18.,17.,16.},{15.,14.,13.},{12.,11.,10.}},
+                      {{9.,8.,7.},{6.,5.,4.},{3.,2.,1.}} };
+  float r[3][3][3];
+
+  addCubes(&m,&n,&r,3);
+  printf("Cube m = \n");
+  printCube(&m,3);
+  printf("Cube n = \n");
+  printCube(&n,3);
+  printf("Resulting cube = \n");
+  printCube(&r,3);
+
+
+  int depth = 10;
+  int pt[10];
+  pt[0] = 1;
+  recursivePascalTriangle(pt, 1, depth);
+}
